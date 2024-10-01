@@ -33,3 +33,14 @@ canvas {
 #barycentric-gui>.title {
 	display: none;
 }
+
+footer {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	padding: 4px;
+}
+
+footer a {
+	color: lightskyblue;
+}
