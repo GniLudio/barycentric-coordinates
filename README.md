@@ -2,7 +2,7 @@
 
 A demonstration of the barycentric coordinates.
 
-![Preview Video](./resources/preview.mp4)
+![Preview Video](./resources/preview.gif)
 
 ## Controls
 | Control | Description |
