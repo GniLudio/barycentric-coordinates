@@ -4,8 +4,8 @@ export default {
 	triangle: {
 		position: [
 			new THREE.Vector3(0, 20, 0),
-			new THREE.Vector3(-20, -10, 0),
 			new THREE.Vector3(20, -10, 0),
+			new THREE.Vector3(-20, -10, 0),
 		],
 		colors: [
 			new THREE.Color("rgb(255, 0, 0)"),
