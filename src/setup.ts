@@ -16,7 +16,7 @@ export function createRenderer() {
 export function createCamera() {
 	const camera = new THREE.PerspectiveCamera(undefined, window.innerWidth / window.innerHeight, 0.01, Number.MAX_SAFE_INTEGER);
 	camera.position.copy(settings.camera.position);
-	camera.lookAt(new THREE.Vector3());
+	camera.lookAt(new THREE.Triangle(...settings.triangle.position).getMidpoint(new THREE.Vector3()));
 	camera.updateProjectionMatrix();
 	return camera;
 }
@@ -28,7 +28,9 @@ export function createScene() {
 }
 
 export function createAxesHelper() {
-	return new THREE.AxesHelper(Number.MAX_SAFE_INTEGER);
+	const helper = new THREE.AxesHelper(Number.MAX_SAFE_INTEGER);
+	helper.visible = settings.apperance.axes;
+	return helper;
 }
 
 export function createTriangleSpheres(spheresVisible: { value: boolean }) {
@@ -82,7 +84,7 @@ export function createAdvancedGUI(
 	onVertexColorChanged: Function, onVertexVisiblityChanged: Function, onPointMoved: (i: number) => void, onVertexMoved: (i: number) => void,
 	resetAll: Function, resetCamera: Function, resetAppearance: Function, resetTriangle: Function, resetBarycentricCoordiantes: Function
 ) {
-	const gui = new GUI.GUI();
+	const gui = new GUI.GUI().close();
 	gui.domElement.id = "advanced-gui";
 
 	const appearanceFolder = gui.addFolder("Appearance");

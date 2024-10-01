@@ -20,3 +20,8 @@ export function projectPointOntoPlane(lineOrigin: THREE.Vector3, lineDirection: 
 	}
 	return undefined;
 }
+
+
+export function convertMeshesToTriangle(meshes: THREE.Mesh[]): THREE.Triangle {
+	return new THREE.Triangle(...meshes.map((mesh) => mesh.position));
+}

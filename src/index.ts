@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as setup from './setup';
 import settings from './settings';
-import { addVectorControls, keepPointInsideTriangle, projectPointOntoPlane } from './utils';
+import { addVectorControls, convertMeshesToTriangle, keepPointInsideTriangle, projectPointOntoPlane } from './utils';
 
 console.debug("index.ts loaded");
 
@@ -22,12 +22,12 @@ const [triangleGeometry, triangleMesh] = setup.createTriangleMesh();
 const pointMesh: THREE.Mesh = setup.createPointMesh();
 const orbitControls = setup.createOrbitControls(renderer, camera);
 const dragControls = setup.createDragControls(renderer, camera, orbitControls, [pointMesh, ...triangleSpheres], onDrag);
+const [barycentricGUI, barycentricControllers] = setup.createBarycentricGUI();
 const advancedGUI = setup.createAdvancedGUI(
 	scene, pointMesh, triangleSpheres, verticesVisible, axesHelper,
 	updateTriangleColor, updateVerticesVisibility, onPointMovedGUI, onVertexMoved,
 	resetAll, resetCamera, resetAppearance, resetTriangle, resetBarycentricCoordiantes,
 );
-const [barycentricGUI, barycentricControllers] = setup.createBarycentricGUI();
 
 updateTrianglePosition();
 updateTriangleColor();
@@ -91,7 +91,7 @@ function onVertexMoved(): void {
 
 function onInsideTriangleToggled(): void {
 	if (insideTriangle.value) {
-		keepPointInsideTriangle(getTriangle(), pointMesh.position);
+		keepPointInsideTriangle(convertMeshesToTriangle(triangleSpheres), pointMesh.position);
 	}
 	updateBarycentricControllers();
 }
@@ -127,7 +127,7 @@ function onBarycentricCoordinateChanged(i: number): void {
 }
 
 function onPointDragged(): void {
-	const triangle = getTriangle();
+	const triangle = convertMeshesToTriangle(triangleSpheres);
 	const cameraToPoint = pointMesh.position.clone().sub(camera.position);
 	const projected = projectPointOntoPlane(camera.position, cameraToPoint, triangle.a, triangle.getNormal(new THREE.Vector3()));
 	if (projected) {
@@ -136,20 +136,24 @@ function onPointDragged(): void {
 		triangle.getPlane(new THREE.Plane()).projectPoint(pointMesh.position, pointMesh.position)
 	}
 	if (insideTriangle.value) {
-		keepPointInsideTriangle(getTriangle(), pointMesh.position);
+		keepPointInsideTriangle(convertMeshesToTriangle(triangleSpheres), pointMesh.position);
 	}
 	updateBarycentricCoordinates();
 }
 
 function onPointMovedGUI(i: number): void {
-	const triangle = getTriangle();
+	const triangle = convertMeshesToTriangle(triangleSpheres);
 	const planeNormal = triangle.getNormal(new THREE.Vector3());
 	const planeOrigin = triangle.getMidpoint(new THREE.Vector3());
 	const direction = new THREE.Vector3(i == 0 ? 0 : 1, i == 1 ? 0 : 1, i == 2 ? 0 : 1);
-	const projected = projectPointOntoPlane(pointMesh.position, direction, planeOrigin, planeNormal)!;
-	pointMesh.position.copy(projected);
+	const projected = projectPointOntoPlane(pointMesh.position, direction, planeOrigin, planeNormal);
+	if (projected) {
+		pointMesh.position.copy(projected);
+	} else {
+		triangle.getPlane(new THREE.Plane()).projectPoint(pointMesh.position, pointMesh.position);
+	}
 	if (insideTriangle.value) {
-		keepPointInsideTriangle(getTriangle(), pointMesh.position);
+		keepPointInsideTriangle(convertMeshesToTriangle(triangleSpheres), pointMesh.position);
 	}
 	updateBarycentricCoordinates();
 }
@@ -192,11 +196,7 @@ function resetTriangle(): void {
 	updatePointPosition();
 }
 
-// HELPER FUNCTIONS
-function getTriangle(): THREE.Triangle {
-	return new THREE.Triangle(...triangleSpheres.map((t) => t.position));
-}
-
+// UPDATE FUNCTIONS
 function updateTrianglePosition(): void {
 	const buffer = new THREE.BufferAttribute(new Float32Array(triangleSpheres.flatMap((v) => [v.position.x, v.position.y, v.position.z])), 3);
 	triangleGeometry.setAttribute("position", buffer);
@@ -215,7 +215,7 @@ function updatePointPosition(): void {
 }
 
 function updateBarycentricCoordinates(): void {
-	getTriangle().getBarycoord(pointMesh.position, barycentricCoordinates);
+	convertMeshesToTriangle(triangleSpheres).getBarycoord(pointMesh.position, barycentricCoordinates);
 }
 
 function updateVerticesVisibility(): void {

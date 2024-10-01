@@ -3,9 +3,9 @@ import * as THREE from "three";
 export default {
 	triangle: {
 		position: [
-			new THREE.Vector3(30, 0, 0),
-			new THREE.Vector3(0, 30, 0),
-			new THREE.Vector3(0, 0, 30),
+			new THREE.Vector3(0, 20, 0),
+			new THREE.Vector3(-20, -10, 0),
+			new THREE.Vector3(20, -10, 0),
 		],
 		colors: [
 			new THREE.Color("rgb(255, 0, 0)"),
@@ -15,14 +15,15 @@ export default {
 		sphere: {
 			radius: 1,
 			segments: 32,
-			visible: true,
+			visible: false,
 		}
 	},
 	background: {
 		color: new THREE.Color("rgb(64, 64, 64)"),
 	},
 	camera: {
-		position: new THREE.Vector3(50, 50, 50),
+		position: new THREE.Vector3(0, 0, 50),
+
 	},
 	point: {
 		radius: 1,
@@ -34,7 +35,7 @@ export default {
 		insideTriangle: true,
 	},
 	apperance: {
-		axes: true,
+		axes: false,
 	},
 	controls: ""
 		+ "Left Mouse - Move Camera & Vertices & Point\n"
