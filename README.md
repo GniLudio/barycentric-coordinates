@@ -1,6 +1,7 @@
 # Barycentric Coordinates
 
-A demonstration of the barycentric coordinates.
+A demonstration of the barycentric coordinates.  
+Try it yourself on www.barycentric-coordinates.com
 
 ![Preview Video](./resources/preview.gif)
 
