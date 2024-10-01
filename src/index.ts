@@ -54,7 +54,7 @@ function onKeyDown(event: KeyboardEvent) {
 		case "i":
 		case "I":
 			insideTriangle.value = !insideTriangle.value;
-			onInsideTriangleToggled();
+			onInsideTriangleChanged();
 			break;
 		case "a":
 		case "A":
@@ -89,7 +89,7 @@ function onVertexMoved(): void {
 	updatePointPosition();
 }
 
-function onInsideTriangleToggled(): void {
+function onInsideTriangleChanged(): void {
 	if (insideTriangle.value) {
 		keepPointInsideTriangle(convertMeshesToTriangle(triangleSpheres), pointMesh.position);
 	}
@@ -160,6 +160,9 @@ function onPointMovedGUI(i: number): void {
 
 // RESET FUNCTIONS
 function resetAll(): void {
+	insideTriangle.value = settings.barycentricCoordiantes.insideTriangle;
+	onInsideTriangleChanged();
+
 	resetCamera();
 	resetAppearance();
 	resetTriangle();
@@ -228,7 +231,7 @@ function updateBarycentricControllers(): void {
 	barycentricControllers.forEach((c) => c.destroy());
 	barycentricControllers.splice(0);
 	barycentricControllers.push(...addVectorControls(barycentricGUI, barycentricCoordinates, ["Alpha", "Beta", "Gamma"], onBarycentricCoordinateChanged, 3));
-	barycentricControllers.push(barycentricGUI.add(insideTriangle, "value").name("Inside Triangle").listen(true).onChange(onInsideTriangleToggled));
+	barycentricControllers.push(barycentricGUI.add(insideTriangle, "value").name("Inside Triangle").listen(true).onChange(onInsideTriangleChanged));
 	if (insideTriangle.value) {
 		for (const controller of barycentricControllers) {
 			controller.min(0).max(1);
