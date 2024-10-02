@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import * as GUI from 'lil-gui';
 
-export function addVectorControls(folder: GUI.GUI, obj: THREE.Vector3, names: string[], onChange?: (i: number) => void, decimals: number = 3): GUI.Controller[] {
+export function addVectorControls(folder: GUI.GUI, obj: THREE.Vector3, names: string[], onChange?: (i: number) => void, decimals: number = 1): GUI.Controller[] {
     return ["x", "y", "z"].map((e, i) => {
-        const controller = folder.add(obj, e).name(names[i]).decimals(decimals).listen(true);
+        const controller = folder.add(obj, e).name(names[i]).decimals(decimals).step(0.1 ** decimals).listen(true);
         if (onChange) controller.onChange(() => onChange(i));
         return controller;
     });

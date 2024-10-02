@@ -236,5 +236,10 @@ function updateBarycentricControllers(): void {
         for (const controller of barycentricControllers) {
             controller.min(0).max(1);
         }
+    } else {
+        for (const controller of barycentricControllers) {
+            controller.step(0.01).decimals(2);
+
+        }
     }
 }
