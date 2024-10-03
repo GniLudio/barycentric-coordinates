@@ -11,6 +11,7 @@ const barycentricCoordinates = settings.barycentricCoordiantes.coordinates.clone
 // Container for Settings
 const insideTriangle = { value: settings.barycentricCoordiantes.insideTriangle };
 const verticesVisible = { value: settings.triangle.sphere.visible };
+const balancingMode = { value: settings.barycentricCoordiantes.balancingMode };
 
 // Setup
 const renderer = setup.createRenderer();
@@ -103,28 +104,33 @@ function onBarycentricCoordinateChanged(i: number): void {
     }
     // shift the two unedited components
     const deviation = 1 - (barycentricCoordinates.x + barycentricCoordinates.y + barycentricCoordinates.z);
-    const c0 = i;
-    const c1 = [0, 1, 2].find((c) => c != c0)!;
-    const c2 = [0, 1, 2].find((c) => c != c0 && c != c1)!;
-    const v0 = barycentricCoordinates.getComponent(c0);
+    const c1 = [0, 1, 2].find((c) => c != i)!;
+    const c2 = [0, 1, 2].find((c) => c != i && c != c1)!;
     const v1 = barycentricCoordinates.getComponent(c1);
     const v2 = barycentricCoordinates.getComponent(c2);
-    if (v1 == 0 && v2 == 0) {
+    if (balancingMode.value == "evenly") {
         barycentricCoordinates.setComponent(c1, v1 + deviation / 2);
         barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
+    } else {
+        if (v1 == 0 && v2 == 0) {
+            barycentricCoordinates.setComponent(c1, v1 + deviation / 2);
+            barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
+        }
+        else if (v1 == 0) {
+            barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
+        }
+        else if (v2 == 0) {
+            barycentricCoordinates.setComponent(c1, v1 + deviation / 2);
+        }
+        else {
+            const r1 = v1 / (v1 + v2);
+            const r2 = v2 / (v1 + v2);
+            barycentricCoordinates.setComponent(c1, v1 + deviation * r1);
+            barycentricCoordinates.setComponent(c2, v2 + deviation * r2);
+        }
     }
-    else if (v1 == 0) {
-        barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
-    }
-    else if (v2 == 0) {
-        barycentricCoordinates.setComponent(c1, v1 + deviation / 2);
-    }
-    else {
-        const r1 = v1 / (v1 + v2);
-        const r2 = v2 / (v1 + v2);
-        barycentricCoordinates.setComponent(c1, v1 + deviation * r1);
-        barycentricCoordinates.setComponent(c2, v2 + deviation * r2);
-    }
+
+
 
 
     // keep the two unedited components inside the triangle
@@ -250,6 +256,7 @@ function updateBarycentricControllers(): void {
     barycentricControllers.forEach((c) => c.destroy());
     barycentricControllers.splice(0);
     barycentricControllers.push(...addVectorControls(barycentricGUI, barycentricCoordinates, ["Alpha", "Beta", "Gamma"], onBarycentricCoordinateChanged, 3));
+    barycentricControllers.push(barycentricGUI.add(balancingMode, "value").name("Balancing").listen(true).options(["evenly", "ratio"]));
     barycentricControllers.push(barycentricGUI.add(insideTriangle, "value").name("Inside Triangle").listen(true).onChange(onInsideTriangleChanged));
     if (insideTriangle.value) {
         for (const controller of barycentricControllers) {
@@ -258,7 +265,6 @@ function updateBarycentricControllers(): void {
     } else {
         for (const controller of barycentricControllers) {
             controller.step(0.01).decimals(2);
-
         }
     }
 }
