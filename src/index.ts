@@ -107,7 +107,7 @@ function onBarycentricCoordinateChanged(i: number): void {
     const c2 = [0, 1, 2].find((c) => c != i && c != c1)!;
     const v1 = barycentricCoordinates.getComponent(c1);
     const v2 = barycentricCoordinates.getComponent(c2);
-    if (v1 > 0 || v1 < 1 || v2 > 0 || v2 < 1) {
+    if (v1 > 0 && v1 < 1 && v2 > 0 && v2 < 1) {
         const vTotal = v1 + v2;
         barycentricCoordinates.setComponent(c1, v1 + deviation * v1 / vTotal);
         barycentricCoordinates.setComponent(c2, v2 + deviation * v2 / vTotal);
