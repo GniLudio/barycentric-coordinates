@@ -102,12 +102,20 @@ function onBarycentricCoordinateChanged(i: number): void {
         keepComponentInside(i);
     }
     // shift the two unedited components
-    const shift = (1 - (barycentricCoordinates.x + barycentricCoordinates.y + barycentricCoordinates.z)) / 2;
-    for (let j = 0; j < 3; j++) {
-        if (j != i) {
-            barycentricCoordinates.setComponent(j, barycentricCoordinates.getComponent(j) + shift);
-        }
+    const deviation = 1 - (barycentricCoordinates.x + barycentricCoordinates.y + barycentricCoordinates.z);
+    const c1 = [0, 1, 2].find((c) => c != i)!;
+    const c2 = [0, 1, 2].find((c) => c != i && c != c1)!;
+    const v1 = barycentricCoordinates.getComponent(c1);
+    const v2 = barycentricCoordinates.getComponent(c2);
+    const vTotal = v1 + v2;
+    if (vTotal > 0) {
+        barycentricCoordinates.setComponent(c1, v1 + deviation * v1 / vTotal);
+        barycentricCoordinates.setComponent(c2, v2 + deviation * v2 / vTotal);
+    } else {
+        barycentricCoordinates.setComponent(c1, v1 + deviation / 2);
+        barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
     }
+
     // keep the two unedited components inside the triangle
     if (insideTriangle.value) {
         const j = [0, 1, 2].findIndex((j) => barycentricCoordinates.getComponent(j) < 0 || barycentricCoordinates.getComponent(j) > 1);
