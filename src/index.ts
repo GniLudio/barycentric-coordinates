@@ -103,18 +103,27 @@ function onBarycentricCoordinateChanged(i: number): void {
     }
     // shift the two unedited components
     const deviation = 1 - (barycentricCoordinates.x + barycentricCoordinates.y + barycentricCoordinates.z);
-    const c1 = [0, 1, 2].find((c) => c != i)!;
-    const c2 = [0, 1, 2].find((c) => c != i && c != c1)!;
+    const c0 = i;
+    const c1 = [0, 1, 2].find((c) => c != c0)!;
+    const c2 = [0, 1, 2].find((c) => c != c0 && c != c1)!;
+    const v0 = barycentricCoordinates.getComponent(c0);
     const v1 = barycentricCoordinates.getComponent(c1);
     const v2 = barycentricCoordinates.getComponent(c2);
-    if (v1 > 0 && v1 < 1 && v2 > 0 && v2 < 1) {
-        const vTotal = v1 + v2;
-        barycentricCoordinates.setComponent(c1, v1 + deviation * v1 / vTotal);
-        barycentricCoordinates.setComponent(c2, v2 + deviation * v2 / vTotal);
-    } else {
-        // TODO: Keep ratio the same when outside too
+    if (v1 == 0 && v2 == 0) {
         barycentricCoordinates.setComponent(c1, v1 + deviation / 2);
         barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
+    }
+    else if (v1 == 0) {
+        barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
+    }
+    else if (v2 == 0) {
+        barycentricCoordinates.setComponent(c1, v1 + deviation / 2);
+    }
+    else {
+        const r1 = v1 / (v1 + v2);
+        const r2 = v2 / (v1 + v2);
+        barycentricCoordinates.setComponent(c1, v1 + deviation * r1);
+        barycentricCoordinates.setComponent(c2, v2 + deviation * r2);
     }
 
 
