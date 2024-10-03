@@ -93,6 +93,7 @@ function onVertexMoved(): void {
 function onInsideTriangleChanged(): void {
     if (insideTriangle.value) {
         keepPointInsideTriangle(convertMeshesToTriangle(triangleSpheres), pointMesh.position);
+        updateBarycentricCoordinates();
     }
     updateBarycentricControllers();
 }
@@ -130,9 +131,6 @@ function onBarycentricCoordinateChanged(i: number): void {
         }
     }
 
-
-
-
     // keep the two unedited components inside the triangle
     if (insideTriangle.value) {
         const j = [0, 1, 2].findIndex((j) => barycentricCoordinates.getComponent(j) < 0 || barycentricCoordinates.getComponent(j) > 1);
@@ -141,8 +139,11 @@ function onBarycentricCoordinateChanged(i: number): void {
             const k = [0, 1, 2].find((x) => x != i && x != j)!;
             barycentricCoordinates.setComponent(k, 1 - barycentricCoordinates.getComponent(i) - barycentricCoordinates.getComponent(j));
         }
-
     }
+    // fix floating point problems
+    const sum = [0, 1, 2].map((c) => barycentricCoordinates.getComponent(c)).reduce((a, b) => a + b);
+    [0, 1, 2].forEach((c) => barycentricCoordinates.setComponent(c, barycentricCoordinates.getComponent(c) / sum));
+
     updatePointPosition();
 
     function keepComponentInside(i: number): void {
