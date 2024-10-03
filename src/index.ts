@@ -186,6 +186,7 @@ function onPointMovedGUI(i: number): void {
 // RESET FUNCTIONS
 function resetAll(): void {
     insideTriangle.value = settings.barycentricCoordiantes.insideTriangle;
+    balancingMode.value = settings.barycentricCoordiantes.balancingMode;
     onInsideTriangleChanged();
 
     resetCamera();
