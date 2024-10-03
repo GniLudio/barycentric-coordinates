@@ -118,10 +118,14 @@ function onBarycentricCoordinateChanged(i: number): void {
             barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
         }
         else if (v1 == 0) {
-            barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
+            barycentricCoordinates.setComponent(c2, v2 + deviation);
         }
         else if (v2 == 0) {
+            barycentricCoordinates.setComponent(c1, v1 + deviation);
+        }
+        else if (-v1 == v2) {
             barycentricCoordinates.setComponent(c1, v1 + deviation / 2);
+            barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
         }
         else {
             const r1 = v1 / (v1 + v2);
@@ -140,10 +144,6 @@ function onBarycentricCoordinateChanged(i: number): void {
             barycentricCoordinates.setComponent(k, 1 - barycentricCoordinates.getComponent(i) - barycentricCoordinates.getComponent(j));
         }
     }
-    // fix floating point problems
-    const sum = [0, 1, 2].map((c) => barycentricCoordinates.getComponent(c)).reduce((a, b) => a + b);
-    [0, 1, 2].forEach((c) => barycentricCoordinates.setComponent(c, barycentricCoordinates.getComponent(c) / sum));
-
     updatePointPosition();
 
     function keepComponentInside(i: number): void {
