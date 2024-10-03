@@ -135,6 +135,13 @@ function onBarycentricCoordinateChanged(i: number): void {
         }
     }
 
+    // fix floating point rounding
+    const sum = [0, 1, 2].map((c) => barycentricCoordinates.getComponent(c)).reduce((a, b) => a + b);
+    if (Math.abs((1 - sum)) > 1e-9) {
+        barycentricCoordinates.setComponent(c1, barycentricCoordinates.getComponent(c1) / (1 - (1 - sum) / 2));
+        barycentricCoordinates.setComponent(c2, barycentricCoordinates.getComponent(c2) / (1 - (1 - sum) / 2));
+    }
+
     // keep the two unedited components inside the triangle
     if (insideTriangle.value) {
         const j = [0, 1, 2].findIndex((j) => barycentricCoordinates.getComponent(j) < 0 || barycentricCoordinates.getComponent(j) > 1);
