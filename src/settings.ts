@@ -33,7 +33,7 @@ export default {
     barycentricCoordiantes: {
         coordinates: new THREE.Vector3(1 / 3, 1 / 3, 1 / 3),
         insideTriangle: true,
-        balancingMode: "ratio" as ("ratio" | "evenly"), // ratio | evenly
+        balancingMode: "ratio" as ("ratio" | "evenly" | "none"), // ratio | evenly | none
     },
     apperance: {
         axes: false,

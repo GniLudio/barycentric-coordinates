@@ -109,10 +109,14 @@ function onBarycentricCoordinateChanged(i: number): void {
     const c2 = [0, 1, 2].find((c) => c != i && c != c1)!;
     const v1 = barycentricCoordinates.getComponent(c1);
     const v2 = barycentricCoordinates.getComponent(c2);
-    if (balancingMode.value == "evenly") {
+    if (balancingMode.value == "none") {
+
+    }
+    else if (balancingMode.value == "evenly") {
         barycentricCoordinates.setComponent(c1, v1 + deviation / 2);
         barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
-    } else {
+    }
+    else if (balancingMode.value == "ratio") {
         if (v1 == 0 && v2 == 0) {
             barycentricCoordinates.setComponent(c1, v1 + deviation / 2);
             barycentricCoordinates.setComponent(c2, v2 + deviation / 2);
@@ -133,13 +137,16 @@ function onBarycentricCoordinateChanged(i: number): void {
             barycentricCoordinates.setComponent(c1, v1 + deviation * r1);
             barycentricCoordinates.setComponent(c2, v2 + deviation * r2);
         }
-    }
 
-    // fix floating point rounding
-    const sum = [0, 1, 2].map((c) => barycentricCoordinates.getComponent(c)).reduce((a, b) => a + b);
-    if (Math.abs((1 - sum)) > 1e-9) {
-        barycentricCoordinates.setComponent(c1, barycentricCoordinates.getComponent(c1) / (1 - (1 - sum) / 2));
-        barycentricCoordinates.setComponent(c2, barycentricCoordinates.getComponent(c2) / (1 - (1 - sum) / 2));
+        // fix floating point precision
+        const sum = [0, 1, 2].map((c) => barycentricCoordinates.getComponent(c)).reduce((a, b) => a + b);
+        if (Math.abs((1 - sum)) > 1e-9) {
+            barycentricCoordinates.setComponent(c1, barycentricCoordinates.getComponent(c1) / (1 - (1 - sum) / 2));
+            barycentricCoordinates.setComponent(c2, barycentricCoordinates.getComponent(c2) / (1 - (1 - sum) / 2));
+        }
+    }
+    else {
+        console.error("Unknown balancing mode", balancingMode.value);
     }
 
     // keep the two unedited components inside the triangle
@@ -265,7 +272,7 @@ function updateBarycentricControllers(): void {
     barycentricControllers.forEach((c) => c.destroy());
     barycentricControllers.splice(0);
     barycentricControllers.push(...addVectorControls(barycentricGUI, barycentricCoordinates, ["Alpha", "Beta", "Gamma"], onBarycentricCoordinateChanged, 3));
-    barycentricControllers.push(barycentricGUI.add(balancingMode, "value").name("Balancing").listen(true).options(["evenly", "ratio"]));
+    barycentricControllers.push(barycentricGUI.add(balancingMode, "value").name("Balancing").listen(true).options(["none", "evenly", "ratio"]));
     barycentricControllers.push(barycentricGUI.add(insideTriangle, "value").name("Inside Triangle").listen(true).onChange(onInsideTriangleChanged));
     if (insideTriangle.value) {
         for (const controller of barycentricControllers) {
