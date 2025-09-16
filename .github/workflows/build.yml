@@ -33,6 +33,8 @@ jobs:
           cp index.html temp
           cp index.css temp
           cp -r dist/ temp
+          mkdir temp/resources
+          cp resources/preview.png temp/resources
 
       - name: Push
         run: |
@@ -44,4 +46,4 @@ jobs:
           git commit -m "Deploy to build branch"
           git branch -M build
           git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git push --force origin build
+          git push origin build
