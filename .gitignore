@@ -4,3 +4,4 @@
 # Hidden Files
 .*
 !.gitignore
+!.github/
