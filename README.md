@@ -16,4 +16,4 @@ Try it yourself on www.barycentric-coordinates.com
 
 ## Build from Source
 1. `npm install`
-2. `npm run build`
+2. `npm run build` or `npm run watch`
